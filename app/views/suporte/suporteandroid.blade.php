@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     
     <title>Ajuda</title>
-    <meta name="description" content="Suporte Aplicativo Du Cheff">
+    <meta name="description" content="Suporte Aplicativo CPR">
     <meta name="author" content="Jean Fabricio">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{{url('favicon.ico')}}"/>
@@ -49,7 +49,7 @@
 	        	Caso nenhuma informação seja modificada a seguinte mensagem será exibida: <i>'Nenhum dado foi alterado!'</i>, 
 	        	se a atualização ocorrer com sucesso a seguinte mensagem será exibida: <i>'Os dados foram atualizados com sucesso!'</i>.
 	        	<br><br>
-	        	<b>IMPORTANTE: O Macarrão Du Cheff utiliza dos dados dos clientes para fazer as entregas com qualidade
+	        	<b>IMPORTANTE: O CPR utiliza dos dados dos clientes para fazer as entregas com qualidade
 	        		e rapidez, é importante que seus dados sejam sempre atualizados.</b>
 	        </p>
 	      </div>
@@ -90,9 +90,9 @@
 	    <div id="login" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 	      <div class="panel-body">
 	        <p>
-	        	O Macarrão Du Cheff cria uma sessão de acesso privado e seguro para seus clientes, uma vez logado
+	        	O CPR cria uma sessão de acesso privado e seguro para seus clientes, uma vez logado
 	        	os seus dados são armazenados somente no seu aparelho, assim você não precisará ficar efetuando
-	        	a login para cada vez que desejar utilizar o Aplicativo Du Cheff.
+	        	a login para cada vez que desejar utilizar o Aplicativo CPR.
 	        </p>
 	      </div>
 	    </div>
@@ -128,7 +128,7 @@
 	    <div id="acompanhamento" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 	      <div class="panel-body">
 	        <p>
-	        	O Macarrão Du Cheff permite que você acompanhe seu pedido desde o envio até a entrega em sua residência.
+	        	O CPR permite que você acompanhe seu pedido desde o envio até a entrega em sua residência.
 	        	<h5>Acompanhar Pedido</h5>
 	        	<ul>
 	        		<li>Navegue para a tela <b>'Home'</b> do aplicativo.</li>
@@ -206,7 +206,7 @@
 	    <div id="sugestoes" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
 	      <div class="panel-body">
 	        <p>
-	        	O Macarrão Du Cheff busca oferecer o melhor serviço de atendimento para seus clientes, você poderá
+	        	O CPR busca oferecer o melhor serviço de atendimento para seus clientes, você poderá
 	        	enviar ou sua reclamação, elogio ou sugestão no próprio aplicativo.
 
 	        	<h5>Enviando Sugestões</h5>

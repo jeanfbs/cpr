@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     
     <title>Suporte</title>
-    <meta name="description" content="Documentação do Sistema Du Cheff">
+    <meta name="description" content="Documentação do Sistema CPR">
     <meta name="author" content="Jean Fabricio">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{{url('favicon.ico')}}"/>
@@ -48,6 +48,11 @@
 					<li>
 						<a href="#usuarios">
 							Usuários
+						</a>
+					</li>
+					<li>
+						<a href="#mesas">
+							Mesas
 						</a>
 					</li>
 					<li>
@@ -112,13 +117,13 @@
 					</li>
 				</ul>
 			<div id="messages-list" class="col-xs-10 col-xs-offset-2">
-				<h1><i class="fa fa-life-ring fa-fw"></i> Suporte Du Cheff</h1>
+				<h1><i class="fa fa-life-ring fa-fw"></i> Suporte CPR</h1>
 				<hr><br><br>
 				<div id="geral">
 					<h2>Informações Gerais</h2>
 					<hr>
 					<p>
-					    O Sistema Web Du Cheff é um sistema de gestão de pedidos multiplataforma
+					    O Sistema Web CPR é um sistema de gestão de pedidos multiplataforma
 					    desenvolvido pela TECHMOB - Empresa Júnior da Universidade Federal de Uberlândia.
 					    <br>
 					    O sistema possuí mecanismos de notificações de novos pedidos e de novas mensagens
@@ -343,6 +348,107 @@
 					<h4><a class="pull-right" href="javascript:history.back()" title="Voltar"><i class="fa fa-chevron-circle-left"></i> Voltar</a></h4>
 				</div>
 				<!-- Fim Usuarios -->
+				<div id="mesas">
+					<h2>Mesas</h2>
+					<hr>
+					<p>
+					    Você pode gerenciar suas mesas de modo fácil e rápido, cadastrando novos registros utilizando
+					    a Aba de Cadastro, você pode consultar seus dados na Aba de Pesquisa e também editar,
+					    visualizar e excluir algum registro.
+					    Todo os módulos de gerenciamento possuem uma interface amigável e acessivel,
+					    você poderá entender qualquer funcionalidade ou opção visualizando os ícones
+					    de acessibilidade do sistema:
+					    <span class="text-primary">
+					    	<i class="fa fa-eye"></i> 
+					    	<i class="fa fa-pencil-square-o"></i> 
+					    	<i class="fa fa-trash"></i>
+					    	<i class="fa fa-chevron-up"></i>
+					    	<i class="fa fa-expand"></i>
+					    	<i class="fa fa-question-circle"></i>
+					    </span><br><br>
+
+					    <b>Opções de Janelas</b><br>
+					    Para minimizar o painel basta clicar no ícone no canto superior direito <i class="fa fa-chevron-up"></i>, e para 
+					    maximizar o painel afim de facilitar a visibilidade clique no ícone <i class="fa fa-expand"></i>.
+
+				    </p>
+				    <p><strong class="text-danger">Nota: Todo o sistema possuí mensagens de alertas informando se sua operação
+				    	foi realizada com sucesso ou se ocorreu algum erro durante o processo.</strong> <br><br>
+				    	Exemplo:
+				    	<div class="alert-success" role="alert">Sucesso</div><br>
+						<div class="alert-info" role="alert">Informação</div><br>
+						<div class="alert-warning" role="alert">Atenção</div><br>
+						<div class="alert-danger" role="alert">Erro!</div><br>
+				    </p>
+				    <br>
+				    <blockquote>
+						<h4 class="text-primary">Cadastro de uma Mesa</h4>
+						<p>
+							Para cadastrar uma nova mesa basta informar o campo obrigatório
+							marcados com um asterísco(*). O campo obrigatórios para uma mesa
+							é: Nome.
+						</p>
+					</blockquote>
+
+					<blockquote>
+						<h4 class="text-primary">Pesquisa de Mesa</h4>
+						<p>
+							Para consultar um registro de uma mesa basta digitar sua pesquisa
+							na caixa texto no canto superior direito da tabela de informações.
+							A pesquisa não é sensível a maiúsculas ou minúsculas, ou seja, não
+							importa se sua pesquisa for com maiúsculas ou minúsculas, o sistema
+							recuperará todas as informações que coinscidem com a pesquisa.
+							Para consultar um registro pelo código do mesmo, basta digitar o zero
+							antes do código. Sua pesquisa é feita sobre todas colunas ordenáveis
+							de modo que o sistema busca qualquer informação que cruze com alguma
+							coluna da base de dados.<br>
+							
+							<b>Exemplo pesquisa pela mesa código 2: {<i>02</i>}</b><br><br>
+
+							<b>Ordenando os Dados</b><br>
+
+							Você pode ordenar os seus dados de acordo com uma coluna específica,
+							basta clicar na coluna para ordenar ou por ordem crescente <i class=" text-danger fa fa-sort-asc"></i>
+							ou por ordem decrescente <i class=" text-danger fa fa-sort-desc"></i><br><br>
+
+							<b>Limitando a quantidade de resultado por página</b><br>
+
+							Você também poderá limitar a quantidade de resultados por página, basta selecionar o seletor
+							no canto superior esquerdo, o valor padrão do seletor é 10, porém você pode escolher
+							outro valor dentre eles: { 25, 50, Todos}.<br><br>
+
+							<b>Paginando os resultados</b><br>
+
+							Todos seus resultados são paginados, para navegar de um página a outra, basta selecionar o
+							número da página que você deseja ir localizado no canto inferior direito,
+							ou se desejar navegar de modo sequencial você poderá apenas clicar nas setas &gt; para ir para
+							a próxima página ou &lt; para voltar.
+							No canto inferior esquerdo você encontrará as etiquetas de resultados, elas
+							informam o total de resultados da busca e qual o intervalo de resultado que
+							você está visualizando.<br><br>
+						</p>
+					</blockquote>
+					<blockquote>
+						<h4 class="text-primary">Edição de uma Mesa</h4>
+						<p>
+							Para editar uma mesa clique no ícone <i class="fa fa-pencil-square-o"></i> uma caixa
+							modal irá aparecer com as informações da mesa já preenchidas, altere apenas os campos
+							de sua preferência. Para salvar clique em <b>Salvar</b>, caso deseje cancelar a edição clique em
+							<b>Cancelar</b>. Na edição o <i>Nome</i> é obrigatório.
+						</p>
+					</blockquote>
+					<blockquote>
+						<h4 class="text-primary">Exclusão de Mesa</h4>
+						<p>
+							Para excluir uma mesa clique no ícone <i class="fa fa-trash"></i> uma mensagem de confirmação
+							será emitida, para confirmar a exclusão clique em <b>Sim</b> caso contrário clique em <b>Não</b>.
+							Se a mesa estiver relacionado a algum pedido, suas informações não podem ser exlcuidas devido a existência
+							de pedidos para aquela mesa.
+						</p>
+					</blockquote>
+					<h4><a class="pull-right" href="javascript:history.back()" title="Voltar"><i class="fa fa-chevron-circle-left"></i> Voltar</a></h4>
+				</div>
+				<!-- Fim clientes -->
 				<div id="clientes">
 					<h2>Clientes</h2>
 					<hr>
@@ -519,7 +625,7 @@
 								com o tipo do prato, ou seja, a classe que ele está relacionado no cardápio,
 								e as categorias de adicionais que não são obrigatórias.
 								<br><br>
-								Exemplo: O prato "Macarrão Du Cheff" foi classificado como o tipo de prato "Massa Comum",
+								Exemplo: O prato "Macarrão CPR" foi classificado como o tipo de prato "Massa Comum",
 								e permite que seu cliente escolha em um mesmo prato três tipos de variedades diferentes
 								"Espaguete, Penne, Gravatinha", esse prato permite as seguintes categorias "Molhos, Guarnições"
 								sendo que para os Molhos o cliente poderá escolher todos os adicionais classificados como
@@ -1529,7 +1635,7 @@
 					<blockquote>
 						<h4 class="text-primary">Rejeitar Pedido</h4>
 						<p>
-							A qualquer momento o Macarrão Du Cheff poderá rejeitar um pedido que foi solicitado
+							A qualquer momento o Macarrão CPR poderá rejeitar um pedido que foi solicitado
 							via aplicativo. Utilize essa opção caso o serviço não pode ser atendido.<br>
 							Para rejeitar o pedido clique no ícone <i class="fa fa-times"></i>, uma caixa modal
 							irá solicitar que você informe o motivo da rejeição do pedido ao cliente, para concluir

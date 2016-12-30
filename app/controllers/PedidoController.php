@@ -28,8 +28,13 @@ class PedidoController extends BaseController{
 	********************************************/
 	public function getCadastro()
 	{
+		$mesas = MesasModel::orderBy("nome","asc")->get();
 		
-		return View::make("pedidos.cadastro");
+		$dados = [
+			"mesas" => $mesas
+		];
+
+		return View::make("pedidos.cadastro")->with($dados);
 	}
 
 	/*******************************************
@@ -166,99 +171,70 @@ class PedidoController extends BaseController{
 			$order = $order[0];
 			$orderIndex = intval($order["column"]);
 		}
-
+		
 		if(isset($dados["search"]))
 			$search = $dados["search"];
 			$limit = intval($dados["length"]);
 			$start = intval($dados["start"]);
 
-		$recordsTotal = count(PedidosModel::get());
+		$count = DB::table("pedidos")
+		->leftJoin("clientes","clientes.cod","=","pedidos.cod_cliente")
+		->get();
+		$recordsTotal = count($count);
 
 		if($limit == -1)
 			$limit = $recordsTotal;
-
+		
+		$filtred = DB::table("pedidos")
+		->leftJoin("clientes","clientes.cod","=","pedidos.cod_cliente")
+		->where(function($query)use($dados){
+			if($dados["filtro"] != "pedidos.cod")
+				$query->where($dados["filtro"],"LIKE","%".$dados["valor_buscado"]."%");
+			else if($dados["valor_buscado"] != ""){
+				$query->where($dados["filtro"],$dados["valor_buscado"]);
+			}
+				
+				
+		})
+		->where(function($query) use($dados){
+			if(intval($dados["status"]) != 0)
+				$query->where("pedidos.status",$dados["status"]);
+		})
+		->select("pedidos.cod","pedidos.nro_mesa as mesa","clientes.nome as cliente",
+			"pedidos.data","pedidos.horario","pedidos.status","pedidos.origem","pedidos.valor_total")
+		->orderBy($columns[$orderIndex]["name"],$order["dir"])
+		->get();
+		
+		$recordsFiltered = count($filtred);
+		
 		$pedidos = DB::table("pedidos")
 		->leftJoin("clientes","clientes.cod","=","pedidos.cod_cliente")
-		->select(DB::raw('SQL_CALC_FOUND_ROWS *'))
-		->where("pedidos.cod","=",$search["value"])
-		->orWhere(function($query) use($search){
-			$exists = PedidosModel::where("data","LIKE","%".$search["value"]."%")
-					  ->get();
-			if(count($exists) > 0)
-			{
-				$query->where("pedidos.data","LIKE","%".$search["value"]."%");
-				return true;
+		->where(function($query)use($dados){
+			if($dados["filtro"] != "pedidos.cod")
+				$query->where($dados["filtro"],"LIKE","%".$dados["valor_buscado"]."%");
+			else if($dados["valor_buscado"] != ""){
+				$query->where($dados["filtro"],$dados["valor_buscado"]);
 			}
-
-			$exists = ClientesModel::where("nome","LIKE","%".$search["value"]."%")
-					  ->get();
-
-			if(count($exists) > 0)
-			{
-				$query->where("clientes.nome","LIKE","%".$search["value"]."%");
-				return true;
-			}
-
-			$exists = PedidosModel::where("valor_total","<=",$search["value"])
-					  ->get();
-			if(count($exists) > 0)
-			{
-				$query->where("pedidos.valor_total","<=",$search["value"]);
-				return true;
-			}
-
+				
+				
 		})
-		->orderBy("pedidos.cod","desc")
+		->where(function($query) use($dados){
+			if(intval($dados["status"]) != 0)
+				$query->where("pedidos.status",$dados["status"]);
+		})
+		->select("pedidos.cod","pedidos.nro_mesa as mesa","clientes.nome as cliente",
+			"pedidos.data","pedidos.horario","pedidos.status","pedidos.origem","pedidos.valor_total")
+		->orderBy($columns[$orderIndex]["name"],$order["dir"])
 		->take($limit)
 		->skip($start)
 		->get();
-		
-		
-		$recordsFiltered = DB::select( DB::raw("SELECT FOUND_ROWS() AS total;") );
-		$recordsFiltered = $recordsFiltered[0];
-		$recordsFiltered = intval($recordsFiltered->total);
 
-		$pedidos = DB::table("pedidos")
-		->leftJoin("clientes","clientes.cod","=","pedidos.cod_cliente")
-		->where("pedidos.cod","=",$search["value"])
-		->orWhere(function($query) use($search){
-			$exists = PedidosModel::where("data","LIKE","%".$search["value"]."%")
-					  ->get();
-			if(count($exists) > 0)
-			{
-				$query->where("pedidos.data","LIKE","%".$search["value"]."%");
-				return true;
-			}
-
-			$exists = ClientesModel::where("nome","LIKE","%".$search["value"]."%")
-					  ->get();
-
-			if(count($exists) > 0)
-			{
-				$query->where("clientes.nome","LIKE","%".$search["value"]."%");
-				return true;
-			}
-
-			$exists = PedidosModel::where("valor_total","<=",$search["value"])
-					  ->get();
-			if(count($exists) > 0)
-			{
-				$query->where("pedidos.valor_total","<=",$search["value"]);
-				return true;
-			}
-
-		})
-		->select("pedidos.cod","pedidos.nro_mesa","clientes.nome","pedidos.data",
-			"pedidos.horario","pedidos.status","pedidos.origem","pedidos.valor_total")
-		->orderBy("pedidos.cod","desc")
-		->take($limit)
-		->skip($start)
-		->get();
 		$json = [];
 		$json["draw"] = intval($dados["draw"]);
 		$json["recordsTotal"] = $recordsTotal;
 		$json["recordsFiltered"] = $recordsFiltered;
 		$json["aaData"] = array();
+
 		foreach ($pedidos as $key => $value) 
 		{
 			$value = (array)$value;
@@ -275,7 +251,7 @@ class PedidoController extends BaseController{
 					$value["status"] = "<span class='text-danger' cod_status=".intval($value["status"]).">".Lang::get('geral.status_rejeitado')."</span>";
 				break;
 				case 4:
-					$value["status"] = "<span class='text-primary' cod_status=".intval($value["status"]).">".Lang::get('geral.status_pronto')."</span>";
+					$value["status"] = "<span class='text-success' cod_status=".intval($value["status"]).">".Lang::get('geral.status_pronto')."</span>";
 				break;
 				case 5:
 					$value["status"] = "<span class='text-info' cod_status=".intval($value["status"]).">".Lang::get('geral.status_pago')."</span>";
@@ -480,7 +456,7 @@ class PedidoController extends BaseController{
 			->join("produtos","adicionais.cod_produto","=","produtos.cod")
 			->whereIn("adicionais.cod_categoria",$codsc)
 			->select("adicionais.cod as cod","produtos.cod as cod_produto","adicionais.cod_categoria",
-				"produtos.nome","produtos.deletada")
+				"produtos.nome","produtos.deletada","adicionais.valor")
 			->orderBy("adicionais.cod_categoria","asc")
 			->get();
 			
@@ -495,12 +471,244 @@ class PedidoController extends BaseController{
 		}
 	}
 
+	/*******************************************
+	*  Metodo que cadastra as informações de 
+	*  pedido via Ajax
+	********************************************/
+	public function postEditar()
+	{
+		if(Input::has("pedido"))
+		{
+			$dados = Input::get("pedido");
+			$cod_pedido = intval($dados["cod_pedido"]);
+
+			$dados_pedido = array();
+			$dados_pedido["cod_cliente"] = $dados["cod_cliente"];
+			$dados_pedido["horario"] = $dados["horario"];
+			$explode = explode("/",$dados["data_pedido"]);
+			$dd = $explode[0];
+			$mm = $explode[1];
+			$yy = $explode[2];
+			$dados_pedido["data"] = $yy."-".$mm."-".$dd;
+			$dados_pedido["nro_mesa"] = $dados["nro_mesa"];
+			$dados_pedido["valor_total"] = $dados["valor_total"];
+			$dados_pedido["origem"] = $dados["origem"];
+			$dados_pedido["observacoes"] = $dados["observacoes"];
+
+			$result = DB::table('pedidos')
+	        ->where('cod', $cod_pedido)
+	        ->update($dados_pedido);
+
+			if(!$result){
+				return 0;
+			}
+
+			$itensOlds = ItemPedidoModel::where("cod_pedido",$cod_pedido)
+			->get();
+
+			foreach ($itensOlds as $key => $item) {
+				
+				DB::table('item_pedido_variedade')
+				->where('cod_item',intval($item->cod_item))
+				->delete();
+
+				DB::table('item_pedido_adicional')
+				->where('cod_item',intval($item->cod_item))
+				->delete();
+
+				$result = DB::table('item_pedido')
+				->where('cod_item',intval($item->cod_item))
+				->delete();
+
+			}
+
+
+			foreach($dados["itens"] as $key => $item) {
+
+				$dados_item = array();
+				$dados_item["cod_pedido"] = $cod_pedido;
+				$dados_item["cod_prato"] = intval($item["cod_prato"]);
+				$dados_item["quantidade"] = intval($item["quantidade"]);
+				
+				$item_pedido = new ItemPedidoModel($dados_item);
+				$status = $item_pedido->save();
+				$cit = $item_pedido->cod_item;
+
+				if(isset($item["variedades"]))
+				{
+					foreach ($item["variedades"] as $key_variedade => $codv) {
+						
+						$dados_variedade = array();
+						$dados_variedade["cod_item"] = $cit;
+						$dados_variedade["cod_prato"] = intval($item["cod_prato"]);
+						$dados_variedade["cod_variedade"] = intval($codv);
+
+						$status = ItemPedidoVariedadeModel::saveMultipleKeys($dados_variedade);
+					}
+				}
+				if(isset($item["adicionais"]))
+				{
+					foreach ($item["adicionais"] as $key_adicional => $codad) {
+
+						$dados_adicional = array();
+						$dados_adicional["cod_item"] = $cit;
+						$dados_adicional["cod_prato"] = intval($item["cod_prato"]);
+						$dados_adicional["cod_adicional"] = intval($codad);
+						
+						$status = ItemPedidoAdicionalModel::saveMultipleKeys($dados_adicional);
+					}
+				}
+
+			}// fim do for para os itens
+
+			
+			if(isset($dados["bebidas"]))
+			{
+				foreach ($dados["bebidas"] as $key_bebidas => $item_bebida) {
+					$result = DB::table('itens_pedido_bebida')
+					->where('cod_pedido',$cod_pedido)
+					->delete();
+					
+					if(!$result) {
+						return 0;
+					}
+
+					$dados_bebida = array();
+					$dados_bebida["cod_pedido"] = $cod_pedido;
+					$dados_bebida["cod_bebida"] = intval($item_bebida["cod"]);
+					$dados_bebida["quantidade"] = intval($item_bebida["quantidade"]);
+					
+					$status = ItemPedidoBebidaModel::saveMultipleKeys($dados_bebida);
+				}
+			}
+
+			if($status) return 1;
+			else 		return 0;
+
+		}//fim do if
+		
+	}
 	public function getNovospedidos(){
 
 		$pedidos = PedidosModel::
 		where("status_notificacao",1)
 		->get();
 		return count($pedidos);
+	}
+
+
+	/*******************************************
+	*  Ação de solicitação Ajax que retorna
+	*  todos os dados de um pedido para edicao
+	********************************************/
+	public function getEditpedido()
+	{
+
+		$codigo = Input::get('codigo');
+
+		$ped = DB::table("pedidos")
+		->leftJoin("clientes","clientes.cod","=","pedidos.cod_cliente")
+		->where("pedidos.cod",$codigo)
+		->select("pedidos.cod as cod_pedido","clientes.cod as cod_cliente","clientes.nome",
+			"clientes.endereco","clientes.telefone","pedidos.data",
+			"pedidos.status","pedidos.horario","pedidos.nro_mesa","pedidos.valor_total",
+			"pedidos.observacoes")
+		->get();
+		if(isset($ped[0]))
+			$ped = $ped[0];
+
+		$json = array();
+
+		$cod_pedido = intval($ped->cod_pedido);
+		$json["cod_pedido"] = $cod_pedido;
+		$json["status"] = $ped->status;
+		$json["hasMesa"] = ($ped->nro_mesa != 0 || $ped->nro_mesa != null) ? true : false;
+		$json["cod_cliente"] = $ped->cod_cliente;
+		$json["cliente"] = $ped->nome;
+		$json["endereco"] = $ped->endereco;
+		$json["telefone"] = $ped->telefone;
+		
+		$explode_1 = explode("-",$ped->data);
+		$json["data"] = $explode_1[2]."/".$explode_1[1]."/".$explode_1[0];
+		
+		$json["horario"] = $ped->horario;
+		$json["nro_mesa"] = $ped->nro_mesa;
+
+		$json["valor_total"] = $ped->valor_total;
+		$json["observacoes"] = $ped->observacoes;
+
+		$json["bebidas"] = array();
+
+		// bebidas do pedido
+		$itb = DB::table("itens_pedido_bebida")
+		->join("bebidas","itens_pedido_bebida.cod_bebida","=","bebidas.cod")
+		->where("itens_pedido_bebida.cod_pedido",$cod_pedido)
+		->orderBy("bebidas.nome","asc")
+		->get();
+
+		foreach ($itb as $key => $value) {
+			$bebida = [];
+			$bebida["cod"] = $value->cod;
+			$bebida["nome"] = $value->nome;
+			$bebida["valor"] = $value->valor;
+			$bebida["quantidade"] = $value->quantidade;
+
+			array_push($json["bebidas"], $bebida);
+		}
+
+		$json["itens"] = array();
+
+		// recupera todos os itens do pedido
+		$itsp = DB::table("item_pedido")
+		->join("pratos","item_pedido.cod_prato","=","pratos.cod")
+		->where("item_pedido.cod_pedido",$cod_pedido)
+		->orderBy("item_pedido.cod_item","asc")
+		->get();
+		
+		foreach ($itsp as $key => $value) 
+		{
+			$item = array();
+
+			$item["cod_item"] = $value->cod_item;
+			$item["cod_prato"] = $value->cod_prato;
+			$item["prato"] = $value->nome;
+			$item["quantidade"] = $value->quantidade;
+			$item["valor"] = $value->valor;
+			$item["variedades"] = array();
+
+			$itpv = DB::table("item_pedido_variedade")
+			->join("variedades","item_pedido_variedade.cod_variedade","=","variedades.cod")
+			->where("item_pedido_variedade.cod_item",$value->cod_item)
+			->get();
+
+			foreach ($itpv as $key_v => $value_v) {
+				
+				$variedade = [];
+				$variedade["cod"] = $value_v->cod;
+				$variedade["nome"] = $value_v->nome;
+
+				array_push($item["variedades"],$variedade);
+			}
+
+			$item["adicionais"] = array();
+
+			$itpcat = DB::table("item_pedido_adicional")
+			->join("adicionais","item_pedido_adicional.cod_adicional","=","adicionais.cod")
+			->where("item_pedido_adicional.cod_item",$value->cod_item)
+			->get();
+			$cat = array();
+			$totalAdicionais = 0.0;
+			foreach ($itpcat as $key_ad => $value_ad) {
+				$totalAdicionais += floatval($value_ad->valor);
+				array_push($cat,$value_ad->cod_adicional);
+			}
+			$item["totalAdicionais"] = $totalAdicionais;
+			$item["adicionais"] = $cat;
+			array_push($json["itens"], $item);
+
+
+		}//fim do for de itens
+		return json_encode($json);
 	}
 	
 }

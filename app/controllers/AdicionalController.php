@@ -106,12 +106,11 @@ class AdicionalController extends BaseController{
 		->where("adicionais.cod",$search["value"])
 		->orWhere("produtos.nome","LIKE","%".$search["value"]."%")
 		->orWhere("categorias.nome","LIKE","%".$search["value"]."%")
-		->select("adicionais.cod","produtos.nome as produto","categorias.nome as categoria","produtos.deletada as produto_deletada","categorias.deletada as categoria_deletada")
+		->select("adicionais.cod","produtos.nome as produto","categorias.nome as categoria","produtos.deletada as produto_deletada","categorias.deletada as categoria_deletada","adicionais.valor")
 		->orderBy($columns[$orderIndex]["name"],$order["dir"])
 		->take($limit)
 		->skip($start)
 		->get();
-		
 		
 		$json = [];
 		$json["draw"] = intval($dados["draw"]);
@@ -121,10 +120,9 @@ class AdicionalController extends BaseController{
 		foreach ($adicionais as $key => $value) 
 		{
 			$value = (array)$value;
-
+			$value["valor"] = number_format(floatval($value["valor"]), 2, '.', '');
 			array_push($json["aaData"], array_values($value));
 		}
-		
 		return json_encode($json);
 	}
 

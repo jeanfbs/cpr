@@ -40,6 +40,7 @@ var dataTable = $('#tabela_dados').DataTable( {
 			},
 			{ "name": "produtos.nome" },
 			{ "name": "categorias.nome" },
+			{ "name": "valor","data":5 },
 		    {
 		    	'width':'12.5%', 
 		    	"data":null,
@@ -129,7 +130,7 @@ $(document).off("click",".editar").on("click",".editar",function(){
     	$("#edit_cod").val(res[0].cod);
     	$("#edit_produtos").val(res[0].cod_produto);
     	$("#edit_categorias").val(res[0].cod_categoria);
-    	
+    	$("#edit_valor").val(parseFloat(res[0].valor).toFixed(2));
     	$("#titulo_modal").html("<b style='color:#d15e5e;'>"+$("#produtos option:selected").text().toUpperCase()+"</b>");
     	
     });

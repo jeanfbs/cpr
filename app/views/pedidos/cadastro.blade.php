@@ -3,7 +3,8 @@
 </style>
 <div class="box-content">
 {{Form::open(array('class' => 'form-horizontal ','id' => 'cadastro_pedido','files' => true))}}
-	<div class="row form-group">
+	<input type="hidden" id="editable" value="0">
+	<div class="row form-group " id="radio-box">
 		<label class="col-sm-2 control-label">{{trans('geral.tipo_pedido')}}</label>
 		<div class="col-sm-6">
 			<div class="radio-inline">
@@ -33,13 +34,13 @@
 		<div class="form-group">
 			<label class="col-sm-2 control-label">*{{trans('geral.endereco')}}</label>
 			<div class="col-sm-8">
-				<input type="text" class="form-control required" name="endereco" maxlength="70" placeholder="{{trans('geral.endereco')}}" title="{{trans('geral.endereco')}}">
+				<input type="text" class="form-control required" name="endereco" maxlength="70" id="endereco" placeholder="{{trans('geral.endereco')}}" title="{{trans('geral.endereco')}}">
 			</div>
 		</div>
 		<div class="form-group">
 			<label class="col-sm-2 control-label">*{{trans('geral.telefone')}}</label>
 			<div class="col-sm-8">
-				<input type="text" class="form-control required" name="telefone" maxlength="20" placeholder="{{trans('geral.telefone')}}" title="{{trans('geral.telefone')}}">
+				<input type="text" class="form-control required" name="telefone" maxlength="20" id="telefone" placeholder="{{trans('geral.telefone')}}" title="{{trans('geral.telefone')}}">
 			</div>
 		</div>
 	</div>
@@ -48,7 +49,14 @@
 		<div class="form-group">
 			<label class="col-sm-2 control-label">*{{trans('geral.nro_mesa')}}</label>
 			<div class="col-sm-2">
-				<input type="text" class="form-control integer" name="nro_mesa" value="0" maxlength="4">
+				<select class="form-control" name="nro_mesa" id="nro_mesa">
+					<option value="0"></option>
+				  @if(isset($mesas))
+				  		@foreach($mesas as $m)
+				  			<option value="{{$m->cod}}">{{$m->nome}}</option>
+						@endforeach
+				  @endif
+				</select>
 			</div>
 		</div>
 	</div>
@@ -211,7 +219,7 @@
 		<div class="form-group">
 			<label class="col-sm-2 control-label">{{trans('geral.obs')}}</label>
 			<div class="col-md-9">
-				<textarea class="form-control" rows="3" name="observacoes"></textarea>
+				<textarea class="form-control" rows="3" name="observacoes" id="observacoes"></textarea>
 			</div>
 		</div>
 	</div>

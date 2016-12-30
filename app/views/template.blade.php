@@ -187,6 +187,12 @@
         </li>
         @endif
         <li>
+          <a href="{{url('panel-control/mesas')}}" class="{{((Session::get('flag') == 14) ? 'active':'')}}">
+            <i class="fa fa-square"></i>
+            <span class="hidden-xs">{{trans('geral.menu_side_mesas')}}</span>
+          </a>
+        </li>
+        <li>
           <a href="{{url('panel-control/clientes')}}" class="{{((Session::get('flag') == 3) ? 'active':'')}}">
             <i class="fa fa-users"></i>
             <span class="hidden-xs">{{trans('geral.menu_side_cliente')}}</span>

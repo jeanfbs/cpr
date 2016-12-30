@@ -24,6 +24,7 @@ return array(
 	'breadcrumb_home' =>'Home',
 	'title_info'	  => 'Informações',
 	'pesquisar' =>"Pesquisar",
+	'filtro' =>"Filtros",
 /*********************************************************************************/
 //  		 Labels Template
 	/* Nav Bar labels */
@@ -37,6 +38,7 @@ return array(
 	/* Menu Side Bar*/
 	'menu_side_dashboard' 				=> 'Dashboard',
 	'menu_side_usuario' 				=> 'Usuários',
+	'menu_side_mesas' 				=> 'Mesas',
 	'menu_side_cliente' 				=> 'Clientes',
 	'menu_side_cardapio' 				=> 'Cardápio',
 	'menu_side_cardapio_bebidas' 		=> 'Bebidas',
@@ -62,7 +64,7 @@ return array(
 /*********************************************************************************/
 //  		 Labels Login
 
-	'bem_vindo'		 => 'Bem Vindo ao Macarrão CPR',
+	'bem_vindo'		 => 'Bem Vindo ao CPR',
 	'login' 		 => 'Login',
 	'senha' 		 => 'Senha',
 	'msg_error_login'=> 'Login ou senha inválidos!',
@@ -120,6 +122,12 @@ return array(
 	'header_cliente' => 'Dados do Cliente',
 	'email' => 'Email',
 
+/*********************************************************************************/
+//  		 Labels Mesas
+
+	'titulo_mesas' => 'Mesas',
+	'header_mesa' => 'Dados da Mesa',
+	
 
 /*********************************************************************************/
 //  		 Bebidas
@@ -227,7 +235,7 @@ return array(
 	// Pedidos em Abertos Pesquisa
 	'status' => 'Status',
 	'origem' => 'Origem',
-	'status_enviado' => "Enviado",
+	'status_enviado' => "Aberto",
 	'status_aceito' => "Aceito e Preparando",
 	'status_rejeitado' => "Rejeitado",
 	'status_pronto' => "Pronto",

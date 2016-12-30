@@ -110,7 +110,7 @@ function alerta()
 {
 	if($("#msg").length > 0)
 	{
-		str = $("#msg").attr('message');
+		str = $("#msg").attr('message')+"";
 		var tipo = str.split("#")[0];
 		var msg = str.split("#")[1];
 		if(tipo == 1)

@@ -1,12 +1,12 @@
 $(document).ready(function() {
 
-	
 /* ------------------------------------------------------------------ 
 |	Cria os Botões de Ver,Editar e Excluir
 ------------------------------------------------------------------*/
-var actions_buttons ='<a chref="#ver" class="abrir"><i class=" fa fa-eye fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_ver+'"></i></a> ';
-    actions_buttons +='<a chref="#concluir" class="concluir"><i class="text-success fa fa-check fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_concluir+'"></i></a> ';
-    actions_buttons +='<a chref="#pago" class="pago"><i class="text-primary fa fa-usd fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_pago+'"></i></a> ';
+var actions_buttons ='<a href="#ver" class="abrir"><i class=" fa fa-eye fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_ver+'"></i></a> ';
+    actions_buttons +='<a href="#atualizar" class="atualizar"><i class="fa fa-edit fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_editar+'"></i></a> ';
+    actions_buttons +='<a href="#concluir" class="concluir"><i class="text-success fa fa-check fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_concluir+'"></i></a> ';
+    actions_buttons +='<a href="#pago" class="pago"><i class="text-primary fa fa-usd fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_pago+'"></i></a> ';
     actions_buttons += '<a href="#rejeitar" class="rejeitar"><i class="text-danger fa fa-times fa-fw" data-toggle="tooltip" data-placement="left" title="'+pt_br.tooltip_rejeitar+'"></i></a>';
 				    					 
 /* ------------------------------------------------------------------ 
@@ -16,6 +16,7 @@ var dataTable = $('#tabela_abertos').DataTable( {
 		"lengthMenu": [[10,25,50, -1], [10,25,50, "Todos"]],// modifica qtd de resultados por pagina
 		"aaSorting": [[ 0, "asc" ]],// indice da coluna para a ordenação no init da DataTable
 		"scrollX": true,
+        "sDom":'<"top"l>rt<"bottom"ip><"clear">',
 		"oLanguage": {
 			"sSearch": pt_br.sSearch,
 			"sLengthMenu": '_MENU_',
@@ -26,30 +27,34 @@ var dataTable = $('#tabela_abertos').DataTable( {
 			"sProcessing":pt_br.sProcessing
 
 		},
-		"bProcessing": true,// mostra o icone de processando...
 		"bServerSide": true,// faz com que o processamento seja do lado do servidor
 		// Ajax propriedades
 		"ajax":{
 			"url":pt_br.absolute_url+"/panel-control/pedidos/pedidosenviados",
-			"type":"POST"
+			"type":"POST",
+            "data":function(d){
+                d.valor_buscado = $("#valor_buscado").val();
+                d.filtro = $("#filtro").val();
+                d.status = $("#status").val();
+            },
 		},
 		// Colunas propriedades
 		"columns": [
 			{ "name": "pedidos.cod" },
 			{ 
                 "width":"11.5%",
-                "name": "pedidos.nro_mesa" 
+                "name": "mesa" 
             },
             { 
                 "width":"20%",
-                "name": "clientes.nome" 
+                "name": "cliente" 
             },
             { 
                 "width":"12%",
                 "name": "pedidos.data" 
             },
             { "name": "pedidos.horario" },
-            { "name": "pedidos.status","data":5 },
+            { "name": "pedidos.status" },
             { "name": "pedidos.origem" },
             { "name": "pedidos.valor_total","width":"10%", },
 		    {
@@ -63,12 +68,41 @@ var dataTable = $('#tabela_abertos').DataTable( {
                 status = $(data[5]).attr("cod_status");
                 if(status == 1)
                 {
-                    $(row).addClass('text-success');
+                    $(row).find(".atualizar").show();
                 } 
                 else
-                   $(row).removeClass('text-success');        
+                   $(row).find(".atualizar").hide();
             }
 });
+
+$('#valor_buscado').on("keyup",function(e) {
+    
+        dataTable.draw();
+});
+
+$('#btn_pesquisar').on("click",function(e) {
+    
+        dataTable.draw();
+});
+
+$(document).off("click",".atualizar").on("click",".atualizar",function(e){
+
+    var codigo = parseInt($(this).parents("tr").children("td:eq(0)").text(),10);
+    console.log(12);
+    $.ajax({
+
+    type: "GET",
+    url : pt_br.absolute_url+"/panel-control/pedidos/editpedido",
+    data : {codigo:codigo},
+    dataType: 'json'
+    }).done(function(res){
+        $("#tabs").tabs({active: 0});
+        localStorage.setItem("editDataPedido",JSON.stringify(res));
+
+    });
+    e.preventDefault();
+});
+
 
 $(document).off("click",".concluir").on("click",".concluir",function(){
 
@@ -179,13 +213,14 @@ $(document).off("click",".rejeitar").on("click",".rejeitar",function(){
 $("#rejeitar").on('click', function(event) {
 
 
-    if($("#observacoes").val() == "")
+    if($("#motivo").val() == "")
     {
         alertErro(pt_br.msg_erro_motivo);
         return false;
     }
     if(!confirm(pt_br.confirma_rejeicao))
         return false;
+
     dados = {};
     dados.codigo = parseInt($("#cod_pedido_rejeitado").val(),10);
     dados.observacoes = $("#motivo").val();

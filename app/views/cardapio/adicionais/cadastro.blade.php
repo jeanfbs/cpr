@@ -17,6 +17,12 @@
 				</select>
 			</div>
 		</div>
+		<div class="form-group">
+			<label class="col-sm-2 control-label">*{{trans('geral.preco')}}</label>
+			<div class="col-sm-4">
+				<input type="text" class="form-control required float" name="valor" placeholder="Ex: 2.50" title="{{trans('geral.preco')}}">
+			</div>
+		</div>
 		<div class="clearfix"></div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-2">

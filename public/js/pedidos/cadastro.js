@@ -2,7 +2,7 @@ $(document).ready(function() {
 
 /* Global Vars*/
 debug_status = false;
-
+$("#div_mesa").hide();
 
 /* ------------------------------------------------------------------ 
 |	Função para o Spinner de quantidade
@@ -12,14 +12,7 @@ spin = $("#qtd_spinner").spinner({
     max:50
 });
 
-/* ------------------------------------------------------------------ 
-|	Funções para o DatePicker e TimePicker do Jquery UI
-------------------------------------------------------------------*/
-$("#data").val(today());
-$("#horario").val(getHorario());
-setInterval(function(){
-	$("#horario").val(getHorario());
-},1000);
+
 
 /* ------------------------------------------------------------------ 
 |	Preenche o select com os tipos de pratos cadastrados
@@ -40,6 +33,32 @@ s2tp.change(function(){
 	$("#prato").getPratosSelect(tipo);
 	
 });
+
+/* ------------------------------------------------------------------ 
+|	Função para o Spinner de quantidade de Bebidas
+------------------------------------------------------------------*/
+spin2 = $("#qtd_spinner_bebida").spinner({
+    min:1,
+    max:50
+});
+/* ------------------------------------------------------------------ 
+|	Preenche o select com os tipos de bebidas cadastrados
+------------------------------------------------------------------*/
+$("#bebidas").getBebidasSelect();
+s2b = $("#bebidas").select2();
+
+if(isEditableMode()){
+/* ------------------------------------------------------------------ 
+|	Funcao que carrega os dados de um pedido no modo de edicao
+------------------------------------------------------------------*/
+	loadStorageDataModeEdit();
+}
+else{
+//Ao carregar o documento limpa o localstorage
+clearPedido();
+runTimeAndDate();
+
+}
 
 /* ------------------------------------------------------------------ 
 |	Busca as variedades do prato no momento da seleção do select
@@ -86,7 +105,6 @@ $(document).on("keyup",".integer",function(){
 |	Oculta ou Mostra os campos dos dados do cliente para pedidos
 | 	Delivery ou não.
 ------------------------------------------------------------------*/
-$("#div_mesa").hide();
 $(".pedido_tipo").change(function(){
 	if($(this).val() == 1)
 	{
@@ -129,14 +147,9 @@ $("#cliente_auto").on("autocompleteselect",function(event,ui){
 
     });
 });
-
-
-//Ao carregar o documento limpa o localstorage
-clearLocalStorage();
 /* ------------------------------------------------------------------ 
 |	Adiciona um item ao pedido
 ------------------------------------------------------------------*/
-var cod_item = 1;
 $("#add_item").off("click").on("click",function(){
 
 	// valida o formulario para: Campos vazios ou senhas diferentes 
@@ -180,10 +193,13 @@ $("#add_item").off("click").on("click",function(){
 
     /* Obtem o array de itens do localstorage */
 	var arr_itens = JSON.parse(localStorage.getItem("itens"));
-
 	if(arr_itens == null)
 	{	// cria o array se não existir no localstorage
 		arr_itens = [];
+		cod_item = 1;
+	}
+	else{
+		cod_item = arr_itens.length;
 	}
 		
 	var item_obj = {};// objeto item 
@@ -197,6 +213,7 @@ $("#add_item").off("click").on("click",function(){
 	};
 
 	item_obj.adicionais = [];// array de adicionais de um unico item
+	item_obj.totalAdicionais = 0.0; // valor total dos adicionais
 	arr_itens.push(item_obj);
 
 	if(debug_status) 
@@ -233,20 +250,20 @@ $(document).off("click",".remover").on("click",".remover",function(){
 	cod_removido = parseInt($(this).parents("tr").children("td:eq(0)").attr("id"),10);
 	// remove o item do localstorage
 
+	var arr_itens = JSON.parse(localStorage.getItem("itens"));
 
 	// corrige os ids na tabela
 	var aux = cod_removido;
 	$(this).parents("tr").fadeOut(200).remove();
 	$("#itens_pedido tr").each(function(index, el) {
 		cod = parseInt($(this).children('td:eq(0)').attr("id"),10);
-		if(cod > cod_removido && cod <= cod_item)
+		if(cod > cod_removido && cod <= arr_itens.length)
 		{
 			$(this).children('td:eq(0)').attr("id",aux);
 			aux++;
 		}		
 	});
-	// corrige os ids no LocalStorage
-	var arr_itens = JSON.parse(localStorage.getItem("itens"));
+	
 	var tmp = [];
 	j = 1;
 	for (var i = 0; i < arr_itens.length; i++) {
@@ -264,8 +281,7 @@ $(document).off("click",".remover").on("click",".remover",function(){
 		console.log(tmp);
 	}
 	localStorage.setItem("itens",JSON.stringify(tmp));
-	cod_item--;
-
+	
 	calculaTotal();
 
 });
@@ -362,17 +378,21 @@ $("#salvar_adicionais").off("click").on("click",function(){
 
 	var adc = [];
 	cit = $("#cit").val();// codigo do item
-
+	var totalAdicionais = 0.0;
 	$(".selecionado").each(function(index, el) {
-			if($(this).is(":checked"))
+			if($(this).is(":checked")){
 				adc.push(parseInt($(this).val(),10));
+				totalAdicionais += parseFloat($(this).parents("tr").children("td:eq(2)").text());
+			}
 	});
+	
 	var arr_itens = JSON.parse(localStorage.getItem("itens"));
 	
 	$.each(arr_itens,function(index, el) {
 		if(el.cod_item == cit)
 		{
 			el.adicionais = adc;
+			el.totalAdicionais = totalAdicionais;
 		}	
 	});
 
@@ -383,7 +403,9 @@ $("#salvar_adicionais").off("click").on("click",function(){
 	}
 
 	localStorage.setItem("itens",JSON.stringify(arr_itens));
+	calculaTotal();
 	$("#detalhes").modal("hide");
+	
 
 });
 /* ------------------------------------------------------------------ 
@@ -392,7 +414,6 @@ $("#salvar_adicionais").off("click").on("click",function(){
 $("#salvar_pedido").off("click").on("click",function(){
 
 	// validações
-
 	tipo_pedido = $(".pedido_tipo:checked").val();
 	if(tipo_pedido == 0)
 	{
@@ -421,7 +442,10 @@ $("#salvar_pedido").off("click").on("click",function(){
 	}
 
 	pedido = {};
-
+	if($("#cod_cliente").val() != "")
+	{
+		pedido.cod_cliente = parseInt($("#cod_cliente").val(),10);
+	}
 	pedido.cliente = $("input[name=nome]").val();
 	pedido.endereco = $("input[name=endereco]").val();
 	pedido.telefone = $("input[name=telefone]").val();
@@ -429,7 +453,7 @@ $("#salvar_pedido").off("click").on("click",function(){
 
 	pedido.data_pedido = $("#data").val();
 	pedido.horario = $("#horario").val();
-	pedido.nro_mesa = parseInt($("input[name=nro_mesa]").val(),10);
+	pedido.nro_mesa = parseInt($("select[name=nro_mesa]").val(),10);
 	pedido.valor_total = parseFloat($("#total").text());
 	pedido.origem = 1;
 	pedido.observacoes = $("textarea[name=observacoes]").val();
@@ -439,10 +463,21 @@ $("#salvar_pedido").off("click").on("click",function(){
 	if(Array.isArray(ls_bebidas))
 		pedido.bebidas = ls_bebidas;
 	
+	var url = pt_br.absolute_url;
+	
+	if($("#editable").val() != 0){
+		pedido.cod_pedido = parseInt($("#editable").val(),10);
+
+		url += "/panel-control/pedidos/editar";
+	}
+	else{
+		url += "/panel-control/pedidos/cadastro";
+	}
+	
 	$.ajax({
 
     type: "POST",
-    url : pt_br.absolute_url+"/panel-control/pedidos/cadastro",
+    url : url,
     data : {pedido:pedido}
     }).done(function(res){
     	
@@ -464,20 +499,6 @@ $("#salvar_pedido").off("click").on("click",function(){
 		console.log(pedido);
 	}
 });
-
-/* ------------------------------------------------------------------ 
-|	Função para o Spinner de quantidade de Bebidas
-------------------------------------------------------------------*/
-spin2 = $("#qtd_spinner_bebida").spinner({
-    min:1,
-    max:50
-});
-/* ------------------------------------------------------------------ 
-|	Preenche o select com os tipos de bebidas cadastrados
-------------------------------------------------------------------*/
-$("#bebidas").getBebidasSelect();
-s2b = $("#bebidas").select2();
-
 
 $("#add_bebida").off("click").on("click",function(){
 
@@ -587,8 +608,10 @@ function clearLocalStorage(){
 }
 function clearPedido()
 {
+	$("#radio-box").show();
+	$("#editable").val(0);
 	$("#dados_cliente input").each(function(index, el) {
-		$(this).val("");		
+		$(this).val("").removeAttr("readonly");		
 	});
 	$("#prato").val("");
 	$("#checks_variedades").empty();
@@ -602,7 +625,7 @@ function clearPedido()
 	$("#total").text("0.00");
 	$("textarea[name=observacoes]").val("");
 	clearLocalStorage();
-
+	runTimeAndDate();
 
 }
 /* ------------------------------------------------------------------ 
@@ -659,6 +682,7 @@ function addRowAdicional(obj){
 					table += "<td style='width:65px;><img class='nophoto' src='../img/noimage.png'/></td>";
 				// segunda coluna nome adicional(Produto)
 				table += "<td>"+it.nome+"</td>";
+				table += "<td>"+parseFloat(it.valor).toFixed(2)+"</td>";
 				
 				table += '<td style="width:65px;" limite='+el.limite+' cct = '+el.cod_categoria+'>';
 				table += '<div class="checkbox"><label><input type="checkbox" class="selecionado" value='+it.cod+'><i class="fa fa-square-o small"></i></label>';
@@ -701,18 +725,19 @@ function addRow(item)
 function loadAdicionaisSalvos(cod_item)
 {
 	var itens = JSON.parse(localStorage.getItem("itens"));
-
-	// itens.adicionais => array de adicionais
+	
 	var tmp_item = {};
 	$.each(itens,function(index, it) {
 		if(it.cod_item == cod_item)
 		{
 			tmp_item = it;
+
 		}
 	});
 	
 	$("#itens_adicionais .selecionado").each(function(){
 		check = $(this);
+		
 		$.each(tmp_item.adicionais,function(ind, cad) {
 			
 			if(parseInt(check.val(),10) == cad)
@@ -722,6 +747,7 @@ function loadAdicionaisSalvos(cod_item)
 			}
 
 		});
+
 	})
 		
 }
@@ -735,11 +761,132 @@ function calculaTotal(){
 	});
 	tipo_pedido = $(".pedido_tipo:checked").val();
 
+	if(localStorage.getItem("itens") != null){
+		arr_itens = JSON.parse(localStorage.getItem("itens"));
+		$.each(arr_itens,function(k,v){
+			total_pedido += (v.totalAdicionais * v.quantidade);
+		});
+	}
+		
 	
 	$("#total_itens").text(total_pedido.toFixed(2));
 	total = parseFloat($("#total_itens").text()) + parseFloat($("#valor_bebidas").text());
 	$("#total").text(total.toFixed(2));
 }
+
+function loadStorageDataModeEdit(){
+
+		var dados = JSON.parse(localStorage.getItem("editDataPedido"));
+		$("#editable").val(dados.cod_pedido);
+
+		$(".pedido_tipo").removeAttr("checked");
+		$("#radio-box").hide();
+		if(dados.hasMesa){
+			$(".pedido_tipo:eq(1)").prop("checked",true);
+			$("#dados_cliente").hide();
+			$("#dados_cliente input").each(function(index, el) {
+				$(this).attr("disabled",true);
+			});
+			setTimeout(function(){
+				$("#nro_mesa").val(dados.nro_mesa).prop("readonly",true);;
+			},50);
+
+			$("#div_mesa").show();
+			
+		}else{
+			
+			$(".pedido_tipo:eq(0)").prop("checked",true);
+			$("#cod_cliente").val(dados.cod_cliente).prop("readonly",true);
+			$("#cliente_auto").val(dados.cliente).prop("readonly",true);;
+			$("#endereco").val(dados.endereco).prop("readonly",true);;
+			$("#telefone").val(dados.telefone).prop("readonly",true);;
+			$("#dados_cliente input").each(function(index, el) {
+				$(this).attr("disabled",false);
+			});
+			$("#dados_cliente").show();
+			$("#div_mesa").hide();
+		}
+
+		$("#data").val(dados.data);
+		$("#horario").val(dados.horario);
+
+		var arr_itens = [];
+		var cod_item = 1;
+		$.each(dados.itens,function(k,v){
+
+			var item_obj = {};// objeto item 
+			item_obj.cod_item = cod_item;
+			item_obj.cod_prato = v.cod_prato;
+			item_obj.quantidade = v.quantidade;
+			item_obj.variedades = [];// array de variedades para um unico item
+
+			$.each(v.variedades,function(k2,variedade){
+				item_obj.variedades.push(variedade.cod);
+			});
+
+			item_obj.adicionais = v.adicionais;
+			item_obj.totalAdicionais = v.totalAdicionais; // valor total dos adicionais
+			arr_itens.push(item_obj);
+			// adicionando as linhas da tabela de pratos
+
+			var table_obj = {};// objeto para construir as linhas da tabela itens
+			table_obj.cod_item = cod_item++;
+			
+			table_obj.cod_prato = v.cod_prato;
+			table_obj.prato = v.prato;
+			table_obj.qtd = v.quantidade;
+			table_obj.valor = v.valor;
+			table_obj.variedades = "";
+
+			$.each(v.variedades,function(k2,variedade){
+				table_obj.variedades += variedade.nome + " ";
+			});
+			addRow(table_obj);
+
+		});
+		var arr_bebidas = [];
+
+		$.each(dados.bebidas,function(k,bebida){
+
+			linha = "<tr>";
+	    	linha += "<td id="+bebida.cod+">"+bebida.nome+"</td>";
+	    	linha += "<td >R$ <span>"+bebida.valor+"</span></td>";
+	    	linha += "<td >"+bebida.quantidade+"</span></td>";
+	    	linha += '<td><a href="#remover_" class="remover_bebida"><i class="fa fa-times"></i></a>&nbsp;&nbsp;</td>'
+	    	linha += "</tr>";
+
+	    	$("#itens_bebida").append(linha);
+	    	
+	    	item_bebida = {};
+			item_bebida.cod = bebida.cod;
+			item_bebida.quantidade = bebida.quantidade;
+
+			arr_bebidas.push(item_bebida);
+			calculaBebidas();
+			
+		});
+		$("#observacoes").text(dados.observacoes);
+		localStorage.setItem("bebidas",JSON.stringify(arr_bebidas));		
+		localStorage.setItem("itens",JSON.stringify(arr_itens));
+		localStorage.removeItem("editDataPedido");
+
+		calculaTotal();
+}
+
+function isEditableMode(){
+	return (localStorage.getItem("editDataPedido") != null && localStorage.getItem("editDataPedido") != "");
+}
+function runTimeAndDate(){
+/* ------------------------------------------------------------------ 
+|	Funções para o DatePicker e TimePicker do Jquery UI
+------------------------------------------------------------------*/
+	$("#data").val(today());
+	$("#horario").val(getHorario());
+	setInterval(function(){
+		$("#horario").val(getHorario());
+	},1000);
+}
+
 function debug(){
 	debug_status = true;
 }

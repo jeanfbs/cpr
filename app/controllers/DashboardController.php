@@ -109,7 +109,7 @@ class DashboardController extends BaseController
 		Session::forget('nome_user');
 		Session::forget('tipo_user');
 
-		return Redirect::to("/login");
+		return Redirect::to("/");
 	}
 	/************************************************
 	* Acao que retorna os dados do grafico de pedidos

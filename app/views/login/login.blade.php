@@ -15,6 +15,9 @@
     <link href="{{url('css/style.css')}}" rel="stylesheet">
     <style type="text/css" media="screen">
     	body{background: #990000 url(./img/devoops_pattern_b10.png) 0 0 repeat!important;}
+    	#page-login img{
+    		margin-top: 75px;
+    	}
     </style>
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -41,8 +44,8 @@
 <div class="container-fluid">
 	<div id="page-login" class="row">
 		<div class="col-xs-12 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
-			<div class="col-md-offset-3">
-				<img src="{{'img/appicon.png'}}" alt="Logo Restaurante" width="200">
+			<div class="text-center">
+				<img src="{{'img/logo.png'}}" alt="Logo Restaurante" width="250">
 			</div>
 			<div class="box">
 

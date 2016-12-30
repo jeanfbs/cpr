@@ -6,9 +6,45 @@
 <div class="row">
 	<div class="col-xs-12">
 		<div class="box-content no-padding">
-			<table class="table table-bordered table-striped table-hover" id="tabela_abertos">
-				<thead>
-					<tr class="active">
+			{{Form::open(array('id'=>"fb_pesquisa"))}}
+					<div class="form-group">
+						<label class="col-sm-1 control-label">{{trans('geral.filtro')}}</label>
+						<div class="col-md-3">
+							<select class="form-control" id="filtro">
+								<option value="pedidos.cod">{{trans('geral.codigo')}}</option>
+							  <option value="pedidos.nro_mesa">{{trans('geral.nro_mesa')}}</option>
+							  <option value="clientes.nome">{{trans('geral.titulo_clientes')}}</option>
+							  <option value="pedidos.data">{{trans('geral.coluna_data')}}</option>
+							  <option value="pedidos.horario">{{trans('geral.horario')}}</option>
+							</select>
+						</div>
+						<div class="col-md-3">
+							<select class="form-control" id="status">
+							  <option value="*"></option>
+							  <option value="1" selected>{{trans('geral.status_enviado')}}</option>
+							  <option value="2">{{trans('geral.status_aceito')}}</option>
+							  <option value="3">{{trans('geral.status_rejeitado')}}</option>
+							  <option value="4">{{trans('geral.status_pronto')}}</option>
+							  <option value="5">{{trans('geral.status_pago')}}</option>
+							  <option value="6">{{trans('geral.status_cancelado')}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="input-group col-md-5">
+					      <input type="text" class="form-control required" id="valor_buscado" placeholder="Buscar por...">
+					      <span class="input-group-btn">
+					        <button class="btn btn-danger" type="button" id="btn_pesquisar"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+					      </span>
+
+					    </div><!-- /input-group -->
+					</div>
+
+				{{Form::close()}}
+			<div class="table-responsive">
+				<table class="table table-bordered table-striped table-hover" id="tabela_abertos">
+					<thead>
+						<tr class="active">
 						<th>{{trans('geral.codigo')}}</th>
 						<th>{{trans('geral.nro_mesa')}}</th>
 						<th>{{trans('geral.cliente')}}</th>
@@ -19,12 +55,12 @@
 						<th>{{trans('geral.coluna_total')}}</th>
 						<th>{{trans('geral.acao')}}</th>
 					</tr>
-				</thead>
-				<tbody id="abertos">
+					</thead>
+					<tbody>
+					</tbody>
 					
-				</tbody>
-				
-			</table>
+				</table>
+			</div>
 		</div>
 	</div>	
 </div>

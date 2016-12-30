@@ -25,7 +25,7 @@ var pt_br =
 	msg_erro_senha:'A senha é obrigatória!',
 	msg_erro_confirmacao:'A confirmação da senha é obrigatória',
 	msg_erro_confirmacao_diferente:'As senhas estão diferentes!',
-	msg_cadastro_sucesso:'Os dados foram cadastrados com sucesso!',
+	msg_cadastro_sucesso:'A operação foi realizada com sucesso!',
 	msg_erro_existe:'Esse registro já existe!',
 	sim:'Sim',
 	nao:'Não',

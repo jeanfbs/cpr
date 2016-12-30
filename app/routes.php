@@ -40,6 +40,8 @@ Route::group(array('prefix' => 'panel-control','before' => 'logado'),function(){
 
 	Route::controller('/clientes', "ClienteController");
 
+	Route::controller('/mesas', "MesaController");
+
 	// Cardapio Routes
 	Route::controller('/bebidas', "BebidaController");
 	Route::controller('/variedades', "VariedadeController");

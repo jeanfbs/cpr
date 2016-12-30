@@ -63,6 +63,7 @@ function clearFormulario()
 {
 	s2p.val("").change();
 	s2c.val("").change();
+    $("input[name=valor]").val("");
 	$("#cadastro textarea").val("");
 }
 

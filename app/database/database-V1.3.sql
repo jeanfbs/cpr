@@ -46,6 +46,13 @@ CREATE TABLE IF NOT EXISTS clientes(
 	data DATE DEFAULT NULL 
 );
 
+-- Tabela: Mesas
+
+CREATE TABLE IF NOT EXISTS mesas(
+	cod	 INT primary key auto_increment,
+	nome VARCHAR(15)
+);
+
 CREATE TABLE IF NOT EXISTS comentarios(
 	cod	 INT primary key auto_increment,
 	cod_cliente	 INT,
@@ -182,7 +189,7 @@ CREATE TABLE IF NOT EXISTS pedidos(
 	data DATE not null,
 	nro_mesa INT,
 	valor_total FLOAT not null,
-	status INT default 1, -- Enviado:1, Aceito e Preparando:2, Rejeitado:3, Pronto:4
+	status INT default 1, -- Aberto:1, Aceito e Preparando:2, Rejeitado:3, Pronto:4
 						 -- Pago:5, Cancelado:6
 	origem INT default null, -- Web:1, APP:2,
 	observacoes TEXT default null,
